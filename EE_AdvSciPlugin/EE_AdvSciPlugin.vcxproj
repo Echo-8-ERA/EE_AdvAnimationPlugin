@@ -46,8 +46,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <CustomBuildBeforeTargets>
-    </CustomBuildBeforeTargets>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -66,16 +65,17 @@
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Link>
     <CustomBuildStep>
-      <Command>
-      </Command>
+      <Command>$(TextTransformUtility) -out "$(ProjectDir)ProjectInfo.xml" "$(ProjectDir)ProjectInfo.tt"</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>
-      </Outputs>
+      <Outputs>NonExistantFile.ext</Outputs>
+      <Message>Transforming ProjectInfo.tt</Message>
     </CustomBuildStep>
     <PreBuildEvent>
-      <Command>$(TextTransformUtility) -out "$(ProjectDir)ProjectInfo.xml" "$(ProjectDir)ProjectInfo.tt"</Command>
-			<Message>Transforming ProjectInfo.tt</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
