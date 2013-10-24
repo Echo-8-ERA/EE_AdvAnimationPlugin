@@ -45,7 +45,11 @@
 	Dim OutputFilename = Path.Combine(TemplateFileDir,
 			Path.GetFileNameWithoutExtension(TemplateFilePath)  & ".xml")
 
-	MessageBox.Show(File.ReadAllText(OutputFilename, System.Text.Encoding.UTF8))
+	If File.Exists(OutputFilename) Then
+		MessageBox.Show(File.ReadAllText(OutputFilename, System.Text.Encoding.UTF8))
+	Else
+		MessageBox.Show(OutputFilename & " not found")
+	End If
 
 
 #>

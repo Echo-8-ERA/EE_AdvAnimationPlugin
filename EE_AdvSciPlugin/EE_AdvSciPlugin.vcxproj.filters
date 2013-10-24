@@ -34,9 +34,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="app.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
@@ -53,11 +50,12 @@
     <None Include="GitSourceControlInfo.ttinclude">
       <Filter>T4 Includes</Filter>
     </None>
-    <None Include="UserSpecific.props" />
     <None Include="ProjectInfo.props" />
     <None Include="XmlProjectInfo.ttinclude">
       <Filter>T4 Includes</Filter>
     </None>
+    <None Include="UserSpecific.props.template" />
+    <None Include="UserSpecific.props" />
     <None Include="ProjectInfo.tt" />
   </ItemGroup>
   <ItemGroup>
