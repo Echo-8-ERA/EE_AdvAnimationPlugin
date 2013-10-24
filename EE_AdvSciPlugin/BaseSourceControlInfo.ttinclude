@@ -1,0 +1,106 @@
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.ComponentModel" #>
+<#+
+	
+	Public MustInherit Class BaseSourceControlInfo
+
+		Protected MustOverride ReadOnly Property SourceControlName As String
+		Protected Property WorkingDirectory As String
+
+		Public Sub New()
+			
+			MyClass.New(String.Empty)
+
+		End Sub
+
+		Public Sub New(ByVal WorkingDirectory As String)
+
+			Me.WorkingDirectory = WorkingDirectory
+
+		End Sub
+		
+		Protected Function Exec(ByVal ExecutablePath As String, ByVal Arguments As String) As IList(Of String)
+
+			Return Exec(Arguments, Nothing)
+
+		End Function
+
+		Protected Function Exec(ExecutablePath As String, ByVal Arguments As String,
+				ByVal ErrorHander As Func(Of Integer, String, Boolean)) As IList(Of String)
+
+			Dim Output As New List(Of String)
+			Exec(ExecutablePath, Arguments, Sub(ByVal OutputLine As String) Output.Add(OutputLine), ErrorHander)
+			Return Output
+
+		End Function
+
+		Protected Sub Exec(ByVal ExecutablePath As String, ByVal Arguments As String,
+				ByVal OutputHandler As Action(Of String), ByVal ErrorHandler As Func(Of Integer, String, Boolean))
+
+			Dim Errors As New StringBuilder
+					
+			Using Proc As New Process()
+
+				With Proc.StartInfo
+
+					.Filename = ExecutablePath
+					.Arguments = Arguments
+					.WorkingDirectory = Me.WorkingDirectory
+					.CreateNoWindow = True
+					.UseShellExecute = False
+					.RedirectStandardOutput = True
+					.RedirectStandardError = True
+
+				End With
+
+				AddHandler Proc.OutputDataReceived, Sub(ByVal Sender As Object, ByVal e As DataReceivedEventArgs)
+							If e.Data IsNot Nothing Then
+								OutputHandler(e.Data)
+							End If
+						End Sub
+
+				AddHandler Proc.ErrorDataReceived, Sub(ByVal Sender As Object, ByVal e As DataReceivedEventArgs)
+							If e.Data IsNot Nothing Then
+								Errors.AppendLine(e.Data)
+							End If
+						End Sub
+
+				Try
+
+					Proc.Start()
+
+				Catch e As Win32Exception When e.NativeErrorCode = 2
+              
+					Throw new Exception(String.Format("{0} command ""{1}"" could not be found." & Environment.NewLine &
+							"Please ensure that {0} is installed.", Me.SourceControlName, ExecutablePath))
+
+				End Try
+
+				Proc.BeginOutputReadLine()
+				Proc.BeginErrorReadLine()
+
+				Proc.WaitForExit()
+
+				If ErrorHandler IsNot Nothing AndAlso ErrorHandler(Proc.ExitCode, Errors.ToString()) AndAlso
+						(Proc.ExitCode <> 0 OrElse Errors.Length > 0) Then
+
+					throw new Exception(String.Format("{0} command ""{1} {2}"" exited with code {3}." & Environment.NewLine &
+							"{4}", Me.SourceControlName, ExecutablePath, Arguments, Proc.ExitCode, Errors))
+         
+				End If
+
+
+			End Using
+
+		End Sub
+
+		Public MustOverride ReadOnly Property Revision As Integer
+
+
+
+	End Class
+
+#>

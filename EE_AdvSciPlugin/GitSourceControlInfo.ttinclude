@@ -1,0 +1,77 @@
+<#
+
+' Copyright © 2013 Ermin Robert Alegrid
+' 
+' Licensed under the Microsoft Reciprocal License (the "License");
+' you may not use this file except in compliance with the License.
+' You may obtain a copy of the License at
+'
+'    http://www.microsoft.com/en-us/openness/licenses.aspx
+'
+' Unless required by applicable law or agreed to in writing, software
+' distributed under the License is distributed on an "AS IS" BASIS,
+' WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+' See the License for the specific language governing permissions and
+' limitations under the License.
+
+#>
+<#@ include file="BaseSourceControlInfo.ttinclude" #>
+<#+ 
+
+	Public Class GitSourceControlInfo
+		Inherits BaseSourceControlInfo
+
+		Private m_Revision As Integer = -1
+		Private m_RevisionID As String = String.Empty
+		Private m_IsDirty As Boolean = False
+
+		Protected Overrides ReadOnly Property SourceControlName As String
+			Get
+				Return "Git"
+			End Get
+		End Property
+
+		Private Sub InitRevisionInfo()
+			Static st_Initialized As Boolean = False
+
+			If Not st_Initialized Then
+
+				MyBase.Exec("git", "rev-list --all --count", Sub(ByVal Output As String) m_Revision = CInt(Output), Nothing)
+				MyBase.Exec("git", "rev-parse HEAD", Sub(ByVal Output As String) m_RevisionID = Output, Nothing)
+				MyBase.Exec("git", "diff-index --quiet HEAD", Nothing, 
+						Function(ByVal ExitCode As Integer, ByVal ErrorMessage As String) As Boolean
+							m_IsDirty = (ExitCode = 1)
+							Return Not m_IsDirty AndAlso ExitCode <> 0
+						End Function)
+
+				st_Initialized = True
+
+			End If
+
+		End Sub
+
+		Public Overrides ReadOnly Property Revision As Integer
+			Get
+				InitRevisionInfo()
+				Return m_Revision
+			End Get
+		End Property
+
+		Public ReadOnly Property RevisionID As String
+			Get
+				InitRevisionInfo()
+				Return m_RevisionID
+			End Get
+		End Property
+
+		Public ReadOnly Property IsWorkingCopyDirty As Boolean
+			Get
+				InitRevisionInfo()
+				Return m_IsDirty
+			End Get
+		End Property
+
+
+	End Class
+
+#>

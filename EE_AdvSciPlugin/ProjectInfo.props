@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<Assembly-Title>Advanced Science Plugin</Assembly-Title>
+		<Assembly-ProductName>Advanced Science Plugin</Assembly-ProductName>
+		<Assembly-Description>Advanced Science Plugin for Kerbal Space Program</Assembly-Description>
+		<Assembly-Company>Echo Enterprises</Assembly-Company>
+		<Assembly-Copyright>© Copyright 2013 Robert Alegrid. All Rights Reserved</Assembly-Copyright>
+		<Assembly-Trademark>© Copyright 2013 Robert Alegrid. All Rights Reserved</Assembly-Trademark>
+		<Assembly-Version-Major>0</Assembly-Version-Major>
+		<Assembly-Version-Minor>1</Assembly-Version-Minor>
+		<Assembly-Version-Build-Stage>Alpha</Assembly-Version-Build-Stage>
+		<Assembly-Version-Build-Count>1</Assembly-Version-Build-Count>
+		<Assembly-Version-Revision>0</Assembly-Version-Revision>
+		<TargetKSPVersion>0.22.0</TargetKSPVersion>
+		<Assembly-Filename-NoExt>EE_Module_Library</Assembly-Filename-NoExt>
+		<Assembly-Filename-Ext>.dll</Assembly-Filename-Ext>
+		<Assembly-Filename>$(Assembly-Filename-NoExt)$(Assembly-Filename-Ext)</Assembly-Filename>
+		
+	</PropertyGroup>
+</Project>

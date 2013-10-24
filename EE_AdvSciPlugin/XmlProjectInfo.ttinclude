@@ -1,0 +1,147 @@
+﻿<#
+
+' Copyright © 2013 Ermin Robert Alegrid
+' 
+' Licensed under the Microsoft Reciprocal License (the "License");
+' you may not use this file except in compliance with the License.
+' You may obtain a copy of the License at
+'
+'    http://www.microsoft.com/en-us/openness/licenses.aspx
+'
+' Unless required by applicable law or agreed to in writing, software
+' distributed under the License is distributed on an "AS IS" BASIS,
+' WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+' See the License for the specific language governing permissions and
+' limitations under the License.
+
+#>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#+
+
+	Public Class XmlProjectInfo
+
+		Private ReadOnly m_Doc As XDocument
+		Private ReadOnly m_Namespace As XNamespace
+		Private ReadOnly m_Company As String
+		Private ReadOnly m_Copyright As String
+		Private ReadOnly m_Description As String
+		Private ReadOnly m_Filename As String
+		Private ReadOnly m_ProductName As String
+		Private ReadOnly m_Title As String
+		Private ReadOnly m_Trademark As String
+		Private ReadOnly m_Version As Version
+
+
+		Public Sub New(ByVal Filename As String)
+			Dim Doc As XDocument = XDocument.Load(Filename)
+			m_Namespace = Doc.Root.GetDefaultNamespace()
+			Dim Root = Doc.Element(m_Namespace + "Project").Element(m_Namespace + "PropertyGroup")
+			m_Doc = Doc
+			m_Company = Me.GetValueOrDefault("Assembly-Company", String.Empty)
+			m_Copyright = Me.GetValueOrDefault("Assembly-Copyright", String.Empty)
+			m_Description = Me.GetValueOrDefault("Assembly-Description", String.Empty)
+			m_Filename = Me.GetValueOrDefault("Assembly-Filename", String.Empty)
+			m_ProductName = Me.GetValueOrDefault("Assembly-ProductName", String.Empty)
+			m_Title = Me.GetValueOrDefault("Assembly-Title", String.Empty)
+			m_Trademark = Me.GetValueOrDefault("Assembly-Trademark", String.Empty)
+			Dim VerMajor As Integer = Me.GetValueOrDefault("Assembly-Version-Major", 0)
+			Dim VerMinor As Integer = Me.GetValueOrDefault("Assembly-Version-Minor", 0)
+			
+			Dim VerBuild = 0
+			Select Case Me.GetValueOrDefault("Assembly-Version-Build-Stage", String.Empty)
+				Case "Alpha"
+					VerBuild = 0
+				Case "Beta"
+					VerBuild = 10000
+				Case "RC"
+					VerBuild = 20000
+				Case "Release"
+					VerBuild = 30000
+				Case String.Empty
+					VerBuild = 0
+				Case Else
+					Throw New ArgumentOutOfRangeException(String.Format("Unknown Project Stage: ""{0}""",
+							Root.Element(m_Namespace + "Assembly-Version-Build-Stage").Value))
+			End Select
+			VerBuild += Me.GetValueOrDefault("Assembly-Version-Build-Count", 0)
+			Dim VerRevision = Me.GetValueOrDefault("Assembly-Version-Revision", 0)
+			m_Version = New Version(VerMajor, VerMinor, VerBuild, VerRevision)
+		End Sub
+
+		Public ReadOnly Property Configuration As String
+			Get
+#If DEBUG Then
+				Return "Debug"
+#Else
+				Return "Release"
+#End If
+			End Get
+		End Property
+
+		Public ReadOnly Property Company As String
+			Get
+				Return m_Company
+			End Get
+		End Property
+
+		Public ReadOnly Property Copyright As String
+			Get
+				Return m_Copyright
+			End Get
+		End Property
+
+		Public ReadOnly Property Description As String
+			Get
+				Return m_Description
+			End Get
+		End Property
+
+		Public ReadOnly Property Filename As String
+			Get
+				Return m_Filename
+			End Get
+		End Property
+
+		Public ReadOnly Property ProductName As String
+			Get
+				Return m_ProductName
+			End Get
+		End Property
+
+		Public ReadOnly Property Title As String
+			Get
+				Return m_Title
+			End Get
+		End Property
+
+		Public ReadOnly Property Trademark As String
+			Get
+				Return m_Trademark
+			End Get
+		End Property
+
+		Public ReadOnly Property Version As Version
+			Get
+				Return m_Version
+			End Get
+		End Property
+				
+		Public Function CustomElement(ByVal ElementName As String) As XElement
+			Return m_Doc.Elements(m_Namespace + "Project").Elements(m_Namespace + "PropertyGroup") _
+					.Elements(m_Namespace + ElementName).First()
+		End Function
+
+		Private Function GetValueOrDefault(Of T)(ByVal ElementName As String, ByVal DefaultValue As T) As T
+
+			Dim Ret = Me.CustomElement(ElementName)
+			Return If(Ret IsNot Nothing, DirectCast(Convert.ChangeType(Ret.Value, GetType(T)), T), DefaultValue)
+
+		End Function
+
+	End Class
+
+#>
