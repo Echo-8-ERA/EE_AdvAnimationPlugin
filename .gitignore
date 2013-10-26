@@ -3,6 +3,7 @@ UserSpecific.props
 
 # Auto-Generated
 ProjectInfo.xml
+ProjectInfo.h
 
 
 ## Ignore Visual Studio temporary files, build results, and

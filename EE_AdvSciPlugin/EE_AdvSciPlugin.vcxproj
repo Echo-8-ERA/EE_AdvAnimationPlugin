@@ -35,12 +35,13 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="UserSpecific.props" />
+    <!--<Import Project="UserSpecific.props" />-->
     <Import Project="ProjectInfo.props" />
+    <Import Project="UserSpecific.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="UserSpecific.props" />
+    <!--<Import Project="UserSpecific.props" />-->
     <Import Project="ProjectInfo.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -122,6 +123,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ProjectInfo.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
@@ -139,7 +141,7 @@
     <Image Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ProjectInfo.tt">
+    <Text Include="ProjectInfo.tt">
       <ExcludedFromBuild>false</ExcludedFromBuild>
       <DeploymentContent>false</DeploymentContent>
       <FileType>Document</FileType>
@@ -149,7 +151,8 @@
       </ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </DeploymentContent>
-    </None>
+    </Text>
+    <None Include="MultipleOutput.ttinclude" />
     <None Include="ProjectInfo.props" />
     <!-- 
 		Reverting to a custom build step because it's not being run every build like it should
@@ -164,6 +167,7 @@
 		-->
     <None Include="BaseSourceControlInfo.ttinclude" />
     <None Include="GitSourceControlInfo.ttinclude" />
+    <!--<None Include="UserSpecific.props" />-->
     <None Include="UserSpecific.props" />
     <None Include="UserSpecific.props.template" />
     <None Include="XmlProjectInfo.ttinclude" />

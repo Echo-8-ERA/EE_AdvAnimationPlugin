@@ -1,4 +1,5 @@
-﻿<#
+﻿<-#@ intellisenseLanguage processor="tangibleT4Editor" language="VB" #->
+<#
 
 ' Copyright © 2013 Ermin Robert Alegrid
 ' 
@@ -18,6 +19,10 @@
 <#@ assembly name="System.Core" #>
 <#@ assembly name="System.Xml" #>
 <#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="Microsoft.VisualBasic" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Xml.Linq" #>
 <#+
@@ -70,6 +75,7 @@
 			VerBuild += Me.GetValueOrDefault("Assembly-Version-Build-Count", 0)
 			Dim VerRevision = Me.GetValueOrDefault("Assembly-Version-Revision", 0)
 			m_Version = New Version(VerMajor, VerMinor, VerBuild, VerRevision)
+
 		End Sub
 
 		Public ReadOnly Property Configuration As String
@@ -137,11 +143,88 @@
 
 		Private Function GetValueOrDefault(Of T)(ByVal ElementName As String, ByVal DefaultValue As T) As T
 
-			Dim Ret = Me.CustomElement(ElementName)
-			Return If(Ret IsNot Nothing, DirectCast(Convert.ChangeType(Ret.Value, GetType(T)), T), DefaultValue)
+			Dim Ret = GetStringEvaluated(ElementName)
+			Return If(Not String.IsNullOrEmpty(Ret), DirectCast(Convert.ChangeType(Ret, GetType(T)), T), DefaultValue)
 
 		End Function
 
+		Private Function GetValue(Of T)(ByVal ElementName As String) As T
+
+			Return GetValueOrDefault(Of T)(ElementName, Nothing)
+
+		End Function
+
+		Private Function GetStringNoEval(ByVal ElementName As String) As String
+
+			Dim Elem = Me.CustomElement(ElementName)
+			Return If(Elem Is Nothing, String.Empty, Elem.Value)
+
+		End Function
+
+		Private Function GetStringEvaluated(ByVal ElementName As String,
+				Optional ByVal RecursiveProperties As Stack(Of String) = Nothing) As String
+
+			If RecursiveProperties Is Nothing Then
+
+				RecursiveProperties = new Stack(Of String)()
+
+			ElseIf RecursiveProperties.Contains(ElementName) Then
+
+				Throw New InvalidOperationException("Cannot process circular references")
+				
+			End If
+
+			Static PropRefExpr As New Regex("\$\((?<PropName>[^)$]+)\)")
+			
+
+			Dim Str As String = GetStringNoEval(ElementName)
+
+			If String.IsNullOrEmpty(Str) Then
+				
+				Return String.Empty
+
+			End If
+
+			Dim Ret As New StringBuilder()
+			Dim LastIndex = 0
+
+			RecursiveProperties.Push(ElementName)
+
+			For Each Match As Match In PropRefExpr.Matches(Str)
+
+				Ret.Append(Str.Substring(LastIndex, LastIndex - Match.Index))
+				Ret.Append(GetStringEvaluated(Match.Groups("PropName").Value, RecursiveProperties))
+				LastIndex += Match.Length
+
+			Next
+
+			Ret.Append(Str.Substring(LastIndex))
+
+			RecursiveProperties.Pop()
+			Return UnEscape(Ret.ToString())
+
+		End Function
+
+		Private Function UnEscape(ByVal Str As String) As String
+
+			Static EscRefExpr As New Regex("%(?<HexCode>[A-Fa-f0-9]{2})")
+
+			Do
+
+				Dim EscRef = EscRefExpr.Match(Str)
+
+				If Not EscRef.Success Then
+
+					Return Str
+
+				End If
+
+				Str = Str.Replace(EscRef.Value, ChrW(Convert.ToInt32(EscRef.Groups("HexCode").Value, 16)))
+
+			Loop
+
+		End Function
+					
 	End Class
 
 #>

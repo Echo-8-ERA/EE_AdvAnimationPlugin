@@ -1,0 +1,18 @@
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#+
+
+	Sub SaveOutput(ByVal Filename As String)
+
+    File.WriteAllText(Filename, Me.GenerationEnvironment.ToString(), Encoding.UTF8)
+		ResetOutput()
+
+	End Sub
+
+	Sub ResetOutput()
+
+	  Me.GenerationEnvironment.Length = 0
+
+  End Sub
+
+#>

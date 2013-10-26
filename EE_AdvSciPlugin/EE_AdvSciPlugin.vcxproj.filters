@@ -24,6 +24,9 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProjectInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -56,9 +59,14 @@
     </None>
     <None Include="UserSpecific.props.template" />
     <None Include="UserSpecific.props" />
-    <None Include="ProjectInfo.tt" />
+    <None Include="MultipleOutput.ttinclude">
+      <Filter>T4 Includes</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="ProjectInfo.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ProjectInfo.tt" />
   </ItemGroup>
 </Project>

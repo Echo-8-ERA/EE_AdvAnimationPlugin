@@ -1,6 +1,6 @@
 <#@ template language="VB" hostspecific="true" compilerOptions="/optionexplicit /optionstrict /optioninfer"#>
 <#
-' Copyright © 2013 Ermin Robert Alegrid
+' Copyright Â© 2013 Ermin Robert Alegrid
 ' 
 ' Licensed under the Microsoft Reciprocal License (the "License");
 ' you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
 ' See the License for the specific language governing permissions and
 ' limitations under the License.
 #>
-<#@ output extension=".xml" encoding="utf-8" #>
+<#@ output extension="/" #>
 <#@ include file="GitSourceControlInfo.ttinclude" #>
 <#@ include file="XmlProjectInfo.ttinclude" #>
+<#@ include file="MultipleOutput.ttinclude" #>
 <#@ assembly name="System.Windows.Forms" #>
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Xml.Linq" #>
@@ -34,24 +35,81 @@
   '
 	'  Me.GenerationEnvironment.Remove(0, Me.GenerationEnvironment.Length)
   'End Sub
-	Dim TemplateFilePath = Host.ResolvePath(Host.TemplateFile)
-	Dim TemplateFileDir = Path.GetDirectoryName(TemplateFilePath)
-	If TemplateFileDir.Length = 0 Then
+	Dim TtFilename = Host.ResolvePath(Host.TemplateFile)
+	Dim XmlFilename = Path.ChangeExtension(TtFilename, "xml")
+	Dim HFilename = Path.ChangeExtension(TtFilename, "h")
 
-		TemplateFileDir = Path.GetPathRoot(TemplateFilePath)
+	Dim ShouldUpdate = False
 
+	Try
+
+		Dim PIX = XDocument.Load(TtFilename)
+		Dim LBV = New Version(PIX.<LastBuildVersion>.value)
+
+		ShouldUpdate = LBV <> Ver
+
+	Catch
+
+		ShouldUpdate = True
+
+	End Try
+
+	If ShouldUpdate Then
+		WriteProjectInfoXml(XmlFilename, XPI, GSCI, Ver)
+		WriteProjectInfoH(HFilename, XPI, GSCI, Ver)
 	End If
-
-	Dim OutputFilename = Path.Combine(TemplateFileDir,
-			Path.GetFileNameWithoutExtension(TemplateFilePath)  & ".xml")
-
-	If File.Exists(OutputFilename) Then
-		MessageBox.Show(File.ReadAllText(OutputFilename, System.Text.Encoding.UTF8))
-	Else
-		MessageBox.Show(OutputFilename & " not found")
-	End If
-
 
 #>
-<?xml version="1.0"?>
+<#+
+
+	Sub WriteProjectInfoXml(ByVal Filename As String, ByVal ProjInfo As XmlProjectInfo,
+			ByVal SrcCtrlInfo As BaseSourceControlInfo, ByVal Ver As Version)
+
+		ResetOutput()
+
+#>
+<?xml version="1.0" encoding="utf-8" ?>
 <LastBuildVersion><#= Ver.ToString() #></LastBuildVersion>
+<#+
+		MessageBox.Show(Me.GenerationEnvironment.ToString())
+		SaveOutput(Filename)
+
+	End Sub
+
+	Sub WriteProjectInfoH(ByVal Filename As String, ByVal ProjInfo As XmlProjectInfo,
+			ByVal SrcCtrlInfo As GitSourceControlInfo, ByVal Ver As Version)
+		
+		ResetOutput()
+
+#>
+#define ASSEMBLY_TITLE L"<#= ProjInfo.Title #>"
+#define ASSEMBLY_DESCRIPTION L"<#= ProjInfo.Description #>"
+// Workaround until I can work out how to get MSBUILD properties/variables/etc. into a T4 Template
+// #define ASSEMBLY_CONFIGURATION \
+// 		L"<#= ProjInfo.Configuration #> build for KSP <#= ProjInfo.CustomElement("TargetKSPVersion").Value #>"
+#if _DEBUG
+#define ASSEMBLY_CONFIGURATION L"Debug build for KSP <#= ProjInfo.CustomElement("TargetKSPVersion").Value #>"
+#else
+#define ASSEMBLY_CONFIGURATION L"Release build for KSP <#= ProjInfo.CustomElement("TargetKSPVersion").Value #>"
+#endif
+#define ASSEMBLY_COMPANY L"<#= ProjInfo.Company #>"
+#define ASSEMBLY_PRODUCTNAME L"<#= ProjInfo.ProductName #>"
+#define ASSEMBLY_COPYRIGHT L"<#= ProjInfo.Copyright #>"
+#define ASSEMBLY_TRADEMARK L"<#= ProjInfo.Trademark #>"
+#define ASSEMBLY_VER_MAJOR <#= Ver.Major #>
+#define ASSEMBLY_VER_MINOR <#= Ver.Minor #>
+#define ASSEMBLY_VER_BUILD <#= Ver.Build #>
+#define ASSEMBLY_VER_REVISION <#= Ver.Revision #>
+#define ASSEMBLY_VERSION_FILE "<#= Ver.ToString() #>"
+#define ASSEMBLY_VERSION_INFORMATIONAL L"<#= Ver.ToString() #> for KSP <#=
+		ProjInfo.CustomElement("TargetKSPVersion").Value #> (<#= SrcCtrlInfo.RevisionID #>)"
+#define ASSEMBLY_FILENAMENOEXT L"<#= Path.GetFilenameWithoutExtension(ProjInfo.Filename) #>"
+#define ASSEMBLY_FILEEXTENSION L"<#= Path.GetExtension(ProjInfo.Filename) #>"
+#define ASSEMBLY_FILENAME L"<#= ProjInfo.Filename #>"
+<#+
+		MessageBox.Show(Me.GenerationEnvironment.ToString())
+		SaveOutput(Filename)
+
+	End Sub
+
+#>
