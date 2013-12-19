@@ -1,5 +1,5 @@
 #include "stdafx.h"
-
+#include "ProjectInfo.h"
 using namespace System;
 using namespace System::Reflection;
 using namespace System::Runtime::CompilerServices;
@@ -11,13 +11,13 @@ using namespace System::Security::Permissions;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly:AssemblyTitleAttribute(L"EE_RL_RnD")];
-[assembly:AssemblyDescriptionAttribute(L"")];
-[assembly:AssemblyConfigurationAttribute(L"")];
-[assembly:AssemblyCompanyAttribute(L"")];
-[assembly:AssemblyProductAttribute(L"EE_RL_RnD")];
-[assembly:AssemblyCopyrightAttribute(L"Copyright (c)  2013")];
-[assembly:AssemblyTrademarkAttribute(L"")];
+[assembly:AssemblyTitleAttribute(ASSEMBLY_TITLE)];
+[assembly:AssemblyDescriptionAttribute(ASSEMBLY_DESCRIPTION)];
+[assembly:AssemblyConfigurationAttribute(ASSEMBLY_CONFIGURATION)];
+[assembly:AssemblyCompanyAttribute(ASSEMBLY_COMPANY)];
+[assembly:AssemblyProductAttribute(ASSEMBLY_PRODUCTNAME)];
+[assembly:AssemblyCopyrightAttribute(ASSEMBLY_COPYRIGHT)];
+[assembly:AssemblyTrademarkAttribute(ASSEMBLY_TRADEMARK)];
 [assembly:AssemblyCultureAttribute(L"")];
 
 //
