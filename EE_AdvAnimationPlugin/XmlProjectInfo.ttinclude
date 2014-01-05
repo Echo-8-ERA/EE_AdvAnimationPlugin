@@ -1,5 +1,4 @@
-﻿<-#@ intellisenseLanguage processor="tangibleT4Editor" language="VB" #->
-<#
+﻿<#
 
 ' Copyright © 2013 Ermin Robert Alegrid
 ' 
@@ -39,7 +38,8 @@
 		Private ReadOnly m_Title As String
 		Private ReadOnly m_Trademark As String
 		Private ReadOnly m_Version As Version
-
+		Private ReadOnly m_BuildStage As String
+		Private ReadOnly m_BuildCount As Integer
 
 		Public Sub New(ByVal Filename As String)
 			Dim Doc As XDocument = XDocument.Load(Filename)
@@ -57,7 +57,8 @@
 			Dim VerMinor As Integer = Me.GetValueOrDefault("Assembly-Version-Minor", 0)
 			
 			Dim VerBuild = 0
-			Select Case Me.GetValueOrDefault("Assembly-Version-Build-Stage", String.Empty)
+			m_BuildStage = Me.GetValueOrDefault("Assembly-Version-Build-Stage", String.Empty)
+			Select Case m_BuildStage
 				Case "Alpha"
 					VerBuild = 0
 				Case "Beta"
@@ -72,21 +73,12 @@
 					Throw New ArgumentOutOfRangeException(String.Format("Unknown Project Stage: ""{0}""",
 							Root.Element(m_Namespace + "Assembly-Version-Build-Stage").Value))
 			End Select
-			VerBuild += Me.GetValueOrDefault("Assembly-Version-Build-Count", 0)
+			m_BuildCount = Me.GetValueOrDefault("Assembly-Version-Build-Count", 0)
+			VerBuild += m_BuildCount
 			Dim VerRevision = Me.GetValueOrDefault("Assembly-Version-Revision", 0)
 			m_Version = New Version(VerMajor, VerMinor, VerBuild, VerRevision)
 
 		End Sub
-
-		Public ReadOnly Property Configuration As String
-			Get
-#If DEBUG Then
-				Return "Debug"
-#Else
-				Return "Release"
-#End If
-			End Get
-		End Property
 
 		Public ReadOnly Property Company As String
 			Get
@@ -135,6 +127,19 @@
 				Return m_Version
 			End Get
 		End Property
+		
+		Public ReadOnly Property BuildStage As String
+			Get
+				Return m_BuildStage
+			End Get
+		End Property
+
+		Public ReadOnly Property BuildCount As Integer
+			Get
+				Return m_BuildCount
+			End Get
+		End Property
+
 				
 		Public Function CustomElement(ByVal ElementName As String) As XElement
 			Return m_Doc.Elements(m_Namespace + "Project").Elements(m_Namespace + "PropertyGroup") _
@@ -143,8 +148,12 @@
 
 		Private Function GetValueOrDefault(Of T)(ByVal ElementName As String, ByVal DefaultValue As T) As T
 
-			Dim Ret = GetStringEvaluated(ElementName)
-			Return If(Not String.IsNullOrEmpty(Ret), DirectCast(Convert.ChangeType(Ret, GetType(T)), T), DefaultValue)
+			Try
+				Dim Ret = GetStringEvaluated(ElementName)
+				Return If(Not String.IsNullOrEmpty(Ret), DirectCast(Convert.ChangeType(Ret, GetType(T)), T), DefaultValue)
+			Catch
+				Return DefaultValue
+			End Try
 
 		End Function
 

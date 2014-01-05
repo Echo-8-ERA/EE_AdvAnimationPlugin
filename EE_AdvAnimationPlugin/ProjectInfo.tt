@@ -1,0 +1,152 @@
+<#@ template language="VB" hostspecific="true" compilerOptions="/optionexplicit /optionstrict /optioninfer"#>
+<#
+' Copyright © 2013 Ermin Robert Alegrid
+' 
+' Licensed under the Microsoft Reciprocal License (the "License");
+' you may not use this file except in compliance with the License.
+' You may obtain a copy of the License at
+'
+'    http://www.microsoft.com/en-us/openness/licenses.aspx
+'
+' Unless required by applicable law or agreed to in writing, software
+' distributed under the License is distributed on an "AS IS" BASIS,
+' WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+' See the License for the specific language governing permissions and
+' limitations under the License.
+#>
+<#@ output extension=".xm" #>
+<#@ include file="GitSourceControlInfo.ttinclude" #>
+<#@ include file="XmlProjectInfo.ttinclude" #>
+<#@ include file="MultipleOutput.ttinclude" #>
+<#@ assembly name="System.Windows.Forms" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Windows.Forms" #>
+<#
+	Dim XPI As New XmlProjectInfo("ProjectInfo.props")
+	Dim GSCI As New GitSourceControlInfo()
+
+	Dim Ver = New Version(XPI.Version.Major, XPI.Version.Minor, XPI.Version.Build, GSCI.Revision)
+
+	Dim TtFilename = Host.ResolvePath(Host.TemplateFile)
+	Dim XmlFilename = Path.ChangeExtension(TtFilename, "xml")
+	Dim HFilename = Path.ChangeExtension(TtFilename, "h")
+
+	Dim ShouldUpdate = False
+
+	Try
+
+		Dim PIX = XDocument.Load(TtFilename)
+		Dim LBV = New Version(PIX.<LastBuildVersion>.value)
+
+		ShouldUpdate = LBV <> Ver
+
+	Catch
+
+		ShouldUpdate = True
+
+	End Try
+
+	If ShouldUpdate Then
+		WriteProjectInfoH(HFilename, XPI, GSCI, Ver)
+		WriteProjectInfoXml(XmlFilename, XPI, GSCI, Ver)
+	End If
+
+#>
+<#+
+
+	Sub WriteProjectInfoH(ByVal Filename As String, ByVal ProjInfo As XmlProjectInfo,
+			ByVal SrcCtrlInfo As GitSourceControlInfo, ByVal Ver As Version)
+		
+		ResetOutput()
+
+#>
+/*******************************************************************************
+
+	Copyright © 2013 Ermin Robert Alegrid
+	
+	Licensed under the Microsoft Reciprocal License (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	
+		http://www.microsoft.com/en-us/openness/licenses.aspx
+	
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+
+*******************************************************************************/
+#define ASSEMBLY_TITLE "<#= ProjInfo.Title #>"
+#define ASSEMBLY_DESCRIPTION "<#= ProjInfo.Description #>"
+#ifdef _DEBUG
+#define ASSEMBLY_CONFIGURATION_TYPE "Debug"
+#else
+#define ASSEMBLY_CONFIGURATION_TYPE "Release"
+#endif
+#define ASSEMBLY_CONFIGURATION ASSEMBLY_CONFIGURATION_TYPE ## "build for KSP <#= ProjInfo.CustomElement("TargetKSPVersion").Value #>"
+#define ASSEMBLY_COMPANY "<#= ProjInfo.Company #>"
+#define ASSEMBLY_PRODUCTNAME "<#= ProjInfo.ProductName #>"
+#define ASSEMBLY_COPYRIGHT "<#= ProjInfo.Copyright #>"
+#define ASSEMBLY_TRADEMARK "<#= ProjInfo.Trademark #>"
+#define ASSEMBLY_VER_MAJOR <#= Ver.Major #>
+#define ASSEMBLY_VER_MINOR <#= Ver.Minor #>
+#define ASSEMBLY_VER_BUILD <#= Ver.Build #>
+#define ASSEMBLY_VER_REVISION <#= Ver.Revision #>
+#define ASSEMBLY_VERSION_FILE "<#= Ver.ToString() #>"
+#define ASSEMBLY_VERSION_INFORMATIONAL "<#= Ver.ToString() #> for KSP <#=
+		ProjInfo.CustomElement("TargetKSPVersion").Value #> (<#= SrcCtrlInfo.RevisionID #>)"
+#define ASSEMBLY_FILENAMENOEXT "<#= Path.GetFilenameWithoutExtension(ProjInfo.Filename) #>"
+#define ASSEMBLY_FILEEXTENSION "<#= Path.GetExtension(ProjInfo.Filename) #>"
+#define ASSEMBLY_FILENAME "<#= ProjInfo.Filename #>"
+
+<#+
+		Dim BuildStageFlag = If(ProjInfo.BuildStage <> "Release", "| VS_FF_PRERELEASE", "")
+#>
+#ifdef RC_INVOKED
+#ifdef _DEBUG
+#define VERINFO_FILEFLAG VS_FF_DEBUG <#= BuildStageFlag #>
+#else
+#define VERINFO_FILEFLAG 0 <#= BuildStageFlag #>
+#endif
+#endif
+<#+
+
+		SaveOutput(Filename, Encoding.Unicode)
+
+	End Sub
+
+#>
+<#+
+
+	Sub WriteProjectInfoXml(ByVal Filename As String, ByVal ProjInfo As XmlProjectInfo,
+			ByVal SrcCtrlInfo As BaseSourceControlInfo, ByVal Ver As Version)
+
+		ResetOutput()
+
+#>
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+
+	Copyright © 2013 Ermin Robert Alegrid
+	
+	Licensed under the Microsoft Reciprocal License (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	
+		http://www.microsoft.com/en-us/openness/licenses.aspx
+	
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+
+-->
+<LastBuildVersion><#= Ver.ToString() #></LastBuildVersion>
+<#+
+
+	End Sub
+
+#>
