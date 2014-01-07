@@ -16,6 +16,9 @@
     <Filter Include="Resource Files\T4 Includes">
       <UniqueIdentifier>{4c322783-49f4-4996-af4d-00412ffc05f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ModuleAdvancedAnimation">
+      <UniqueIdentifier>{1b076de0-d266-41dd-817e-6753a0b5ce54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h">
