@@ -32,7 +32,8 @@ using namespace System::Security::Permissions;
 // by using the '*' as shown below:
 
 [assembly:AssemblyVersionAttribute(ASSEMBLY_VERSION_FILE)];
-
+[assembly:AssemblyFileVersionAttribute(ASSEMBLY_VERSION_FILE)];
+[assembly:AssemblyInformationalVersionAttribute(ASSEMBLY_VERSION_INFORMATIONAL)];
 [assembly:ComVisible(false)];
 
 [assembly:CLSCompliantAttribute(true)];
