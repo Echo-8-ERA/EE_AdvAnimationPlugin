@@ -125,16 +125,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Events.hpp" />
+    <ClInclude Include="ModuleAnimatedAttachNode.hpp" />
     <ClInclude Include="ProjectInfo.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="Utilities.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Events.cpp" />
+    <ClCompile Include="Events.VesselEventArgs.cpp" />
+    <ClCompile Include="ModuleAnimatedAttachNode.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

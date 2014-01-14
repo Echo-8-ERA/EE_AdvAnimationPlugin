@@ -19,6 +19,12 @@
     <Filter Include="ModuleAdvancedAnimation">
       <UniqueIdentifier>{1b076de0-d266-41dd-817e-6753a0b5ce54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ModuleAnimatedAttachNode">
+      <UniqueIdentifier>{f8d3f2aa-3a3a-4c0e-9661-50873fadbc3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{48a14e2f-845e-4c3c-922b-c2eba0dec0e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h">
@@ -30,6 +36,15 @@
     <ClInclude Include="ProjectInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleAnimatedAttachNode.hpp">
+      <Filter>ModuleAnimatedAttachNode</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Events.hpp">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp">
@@ -37,6 +52,18 @@
     </ClCompile>
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleAnimatedAttachNode.cpp">
+      <Filter>ModuleAnimatedAttachNode</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Events.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Events.VesselEventArgs.cpp">
+      <Filter>Events</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
